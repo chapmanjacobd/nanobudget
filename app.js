@@ -1,8 +1,18 @@
 const DateTime = luxon.DateTime;
 const Duration = luxon.Duration;
+const RRule = rrule.RRule;
 const startOfDay = DateTime.local().startOf("day").toMillis();
 
-const RRule = rrule.RRule;
+let targetDate = calcPlannedTime();
+
+function calcPlannedTime(events) {
+  return DateTime()
+    .now()
+    .plus({
+      days: 30 * 365,
+      // (sum(events.map((c) => c.duration * c.)) ?? 0) }
+    });
+}
 
 function simpleTime2LuxonDur(simpleTime) {
   const dt = DateTime.fromFormat(simpleTime, "h:m").toMillis();
@@ -22,7 +32,7 @@ function newSimMoney(title = "Money budget") {
 function newSimTime(title = "Time budget") {
   return {
     title,
-    inflows: [], // delegation
+    inflows: [time("Yourseelf", "24:00", "Every day")], // task delegation
     outflows: [time("Sleep", "8:00", "Every 2 months until Jan 01 2077")],
   };
 }
@@ -52,3 +62,7 @@ document.addEventListener("alpine:init", () => {
     },
   });
 });
+
+function calcMoney() {
+  frequency.between(new Date(), targetDate);
+}
