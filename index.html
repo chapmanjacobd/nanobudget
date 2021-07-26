@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="luxon.min.js"></script>
+    <script src="rrule.min.js"></script>
+    <script src="./app.js"></script>
+    <link rel="stylesheet" type="text/css" href="./base.css" media="all">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="UNLI nanoBudget">
+    <meta property="og:description" content="Budget your life in 20mins">
+    <meta property="og:image" content="https://unli.xyz/nanobudget/preview.jpg">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="UNLI nanoBudget">
+    <meta property="twitter:description" content="Budget your life in 20mins">
+    <meta property="twitter:image" content="https://unli.xyz/nanobudget/preview.jpg">
+
+    <title>UNLI nanoBudget</title>
+    <meta id="title" name="title" content="UNLI nanoBudget">
+    <meta id="description" name="description" content="Budget your life in 20mins">
+</head>
+
+<body>
+
+    <div style="display: inline-flex; width: 100%;">
+        <!-- <a href="https://unli.xyz/"><img src="https://unli.xyz/unli.png" alt="UNLI" width="60" height="60" /></a> -->
+        <a href="./"><img src="./logo.png" alt="UNLI nanoBudget" width="60" height="60" /></a>
+
+        <h1 style="margin: auto 0;padding: 0 1rem;text-align: center;">nanoBudget</h1>
+    </div>
+
+
+    <div x-data x-subscribe x-cloak>
+        <!-- time is money -->
+        <!-- jk lol -->
+
+        <template x-for="(sim, index) in $store.sims.simulations" :key="index">
+            <div>
+
+                <div>
+                    <input type="text" x-model="sim.title">
+                </div>
+
+                <div>
+                    <button type="button" class="underline"
+                        @click="$store.sims.simulations.push({title:'Copy of ' + sim.title, sim});">Copy</button>
+                    <template x-if="$store.sims.simulations.length > 1">
+                        <button type="button" class="underline"
+                            @click="$store.sims.simulations.splice(index, 1)">Delete</button>
+                    </template>
+                </div>
+
+            </div>
+        </template>
+
+        <template x-for="(p, index) in $store.sims.get().inflows" :key="index">
+            <div class="passport">
+                <div>
+                    <input :id="`passport-${index}`" :name="`passport-${index}`"></input>
+                </div>
+
+            </div>
+        </template>
+
+    </div>
+
+</body>
+
+</html>
