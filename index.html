@@ -22,8 +22,8 @@
     <meta property="twitter:description" content="Budget your life in 20mins">
     <meta property="twitter:image" content="https://unli.xyz/nanobudget/preview.jpg">
 
-    <title>UNLI nanoBudget</title>
-    <meta id="title" name="title" content="UNLI nanoBudget">
+    <title>nanoBudget (UNLI)</title>
+    <meta id="title" name="title" content="nanoBudget (UNLI)">
     <meta id="description" name="description" content="Budget your life in 20mins">
 </head>
 
@@ -63,13 +63,13 @@
             <template x-for="(sim, index) in $store.sims.simulations" :key="index">
                 <div class="flex">
 
-                    <div>
+                    <div @click="$store.sims.selectedSimulation = sim.title" style="min-width: 12em;">
                         <input type="text" x-model="sim.title">
                     </div>
 
                     <div class="flex">
                         <button type="button" class="underline"
-                            @click="$store.sims.simulations.push({ ...sim, title:'Copy of ' + sim.title });">Copy</button>
+                            @click="$store.sims.simulations.push({ ...JSON.parse(JSON.stringify(sim)), title:'Copy of ' + sim.title });">Copy</button>
                         <template x-if="$store.sims.simulations.length > 1">
                             <button type="button" class="underline"
                                 @click="$store.sims.simulations.splice(index, 1)">Delete</button>
@@ -80,14 +80,58 @@
             </template>
         </div>
 
-        <template x-for="(p, index) in $store.sims.get().inflows" :key="index">
-            <div class="passport">
-                <div>
-                    <input :id="`passport-${index}`" :name="`passport-${index}`"></input>
-                </div>
+        <div>
+            <h3 x-text="$store.sims.selectedSimulation"></h3>
 
+            <h4>Inflows</h4>
+            <template x-for="(p, index) in $store.sims.get().inflows
+                        .sort(sortByPower)" :key="index">
+                <div>
+                    <input x-model="p.account"></input>
+                    <input x-model="p.frequency.toText()"></input>
+                    <input x-model="p.duration.toFormat(`y 'years' d 'days' h 'hours' m 'minutes'`)"></input>
+                    <input x-model="p.price.format()" title="Absolute or symbolic cost"></input>
+
+                    <template x-if="$store.sims.get().inflows.length > 1">
+                        <button type="button" class="underline"
+                            @click="$store.sims.get().inflows.splice(index, 1)">Delete</button>
+                    </template>
+                </div>
+            </template>
+
+            <div x-data="{ new_in: {} }">
+                <input x-model="new_in.account">
+                <input x-model="new_in.frequency">
+                <input x-model="new_in.duration">
+                <input x-model="new_in.price">
+                <button type="button" class="underline"
+                    @click="$store.sims.add_inflow(new_in.account, new_in.frequency, new_in.duration, new_in.price)">Add</button>
             </div>
-        </template>
+
+            <h4>Outflows</h4>
+            <template x-for="(p, index) in $store.sims.get().outflows
+                        .sort(sortByPower)" :key="index">
+                <div>
+                    <input x-model="p.account"></input>
+                    <input x-model="p.frequency.toText()"></input>
+                    <input x-model="p.duration.toFormat(`y 'years' d 'days' h 'hours' m 'minutes'`)"></input>
+                    <input x-model="p.price.format()" title="Absolute or symbolic cost"></input>
+                </div>
+            </template>
+
+            <div x-data="{ new_out: {} }">
+                <input x-model="new_out.account">
+                <input x-model="new_out.frequency">
+                <input x-model="new_out.duration">
+                <input x-model="new_out.price">
+                <button type="button" class="underline"
+                    @click="$store.sims.add_outflow(new_out.account, new_out.frequency, new_out.duration, new_out.price)">Add</button>
+            </div>
+
+
+            <h5 x-text="$store.sims.balance().time"></h5>
+            <h5 x-text="$store.sims.balance().money"></h5>
+        </div>
 
     </div>
 

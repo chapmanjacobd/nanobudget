@@ -18,17 +18,25 @@ document.addEventListener("alpine:init", () => {
       return this.simulations[0];
     },
     balance() {
-      sim = this.get();
-      ins = sim.inflows.map((flow) => findTotals(flow));
-      outs = sim.outflows.map((flow) => findTotals(flow));
+      const sim = this.get();
+      const ins = sim.inflows.map((flow) => findTotals(flow));
+      const outs = sim.outflows.map((flow) => findTotals(flow));
 
       console.log(ins.map((flow) => format_total(flow)));
       console.log(outs.map((flow) => format_total(flow)));
 
-      money_bal = findBalance(ins, outs);
-      console.log(format_total(money_bal));
+      const money_bal = findBalance(ins, outs);
+      // console.log(format_total(money_bal));
 
       return format_total(money_bal);
+    },
+    add_inflow(account, frequency, duration, price) {
+      const sim = this.get();
+      sim.inflows.push(a(account, frequency, duration, price));
+    },
+    add_outflow(account, frequency, duration, price) {
+      const sim = this.get();
+      sim.outflows.push(a(account, frequency, duration, price));
     },
   });
 });
@@ -62,15 +70,25 @@ function newSimMoney(title = "Money-oriented budget") {
 function newSimTime(title = "Time-oriented budget") {
   return {
     title,
-    inflows: [a("Yourseelf", "Every day", "24:00", 0)], // task delegation
-    outflows: [a("Sleep", "Every 2 months until Jan 01 2077", "8:00", 5)],
+    inflows: [
+      a("Yourseelf", "Every day", "24:00", 0),
+      a("Chris", "Every weekday", "8:00", -110), // task delegation
+      a("Maurice", "FREQ=DAILY;INTERVAL=2;BYDAY=MO,TU,WE,TH,FR", "4:00", -3),
+      a("Maurice", "FREQ=DAILY;INTERVAL=2;BYDAY=MO,TU,WE,TH,FR", "4:00", 5),
+    ],
+    outflows: [
+      a("Sleep", "Every day", "8:00", 5),
+      a("Resarch snails", "Every 2 months until Jan 01 2077", "8:00", 50),
+      a("Resarch epidemiology", "Every 2 days until Jan 01 2077", "10:00", 5),
+      a("Resarch epidemiology", "Every 2 days until Jan 01 2077", "10:00", 51),
+    ],
   };
 }
 
 function a(account, frequency_, duration_, price_) {
   return {
     account,
-    frequency: RRule.fromText(frequency_),
+    frequency: frequency_.includes("=") ? RRule.fromString(frequency_) : RRule.fromText(frequency_),
     duration: simpleTime2LuxonDur(duration_),
     price: currency(price_),
   };
@@ -85,9 +103,9 @@ function calcPlannedTime(events) {
 
 function findTotals(flow) {
   const { frequency, duration, price } = flow;
-  occurrences = frequency.between(new Date(), targetDate);
+  const occurrences = frequency.between(new Date(), targetDate);
 
-  totals = {
+  const totals = {
     money: price.multiply(occurrences.length),
     time: Duration.fromMillis(duration * occurrences.length),
   };
@@ -115,4 +133,11 @@ function findBalance(ins, outs) {
     time: Duration.fromMillis(totalTime - totalTimeUsed),
     money: totalMoney.subtract(totalMoneyUsed),
   };
+}
+
+function sortByPower(a, b) {
+  const Ta = findTotals(a);
+  const Tb = findTotals(b);
+
+  return Ta.money / Ta.time < Tb.money / Tb.time;
 }
