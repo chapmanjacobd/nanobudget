@@ -36,29 +36,49 @@
         <h1 style="margin: auto 0;padding: 0 1rem;text-align: center;">nanoBudget</h1>
     </div>
 
+    <style>
+        @media only screen and (min-width: 768px) {
+            html {
+                font-size: 80%;
+                line-height: 1.2;
+            }
+
+            #UI_simulation_list {
+                display: flex;
+                flex-direction: column;
+                max-width: 20em;
+            }
+        }
+
+        .flex {
+            display: flex;
+        }
+    </style>
 
     <div x-data x-subscribe x-cloak>
         <!-- time is money -->
         <!-- jk lol -->
 
-        <template x-for="(sim, index) in $store.sims.simulations" :key="index">
-            <div>
+        <div id='UI_simulation_list'>
+            <template x-for="(sim, index) in $store.sims.simulations" :key="index">
+                <div class="flex">
 
-                <div>
-                    <input type="text" x-model="sim.title">
-                </div>
+                    <div>
+                        <input type="text" x-model="sim.title">
+                    </div>
 
-                <div>
-                    <button type="button" class="underline"
-                        @click="$store.sims.simulations.push({title:'Copy of ' + sim.title, sim});">Copy</button>
-                    <template x-if="$store.sims.simulations.length > 1">
+                    <div class="flex">
                         <button type="button" class="underline"
-                            @click="$store.sims.simulations.splice(index, 1)">Delete</button>
-                    </template>
-                </div>
+                            @click="$store.sims.simulations.push({ ...sim, title:'Copy of ' + sim.title });">Copy</button>
+                        <template x-if="$store.sims.simulations.length > 1">
+                            <button type="button" class="underline"
+                                @click="$store.sims.simulations.splice(index, 1)">Delete</button>
+                        </template>
+                    </div>
 
-            </div>
-        </template>
+                </div>
+            </template>
+        </div>
 
         <template x-for="(p, index) in $store.sims.get().inflows" :key="index">
             <div class="passport">
