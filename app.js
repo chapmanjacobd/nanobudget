@@ -8,7 +8,7 @@ let targetDate = new Date(calcPlannedTime().toISODate());
 document.addEventListener("alpine:init", () => {
   Alpine.store("sims", {
     selectedSimulation: "Time-oriented budget",
-    simulations: [newSimTime(), newSimMoney()],
+    simulations: [],
 
     get(selection = this.selectedSimulation) {
       if (this.simulations.filter((x) => x.title === selection)[0])
@@ -30,13 +30,17 @@ document.addEventListener("alpine:init", () => {
 
       return format_total(money_bal);
     },
-    add_inflow(account, frequency, duration, price) {
-      const sim = this.get();
+    add_inflow(account, frequency, duration, price, sim = this.get()) {
       sim.inflows.push(a(account, frequency, duration, price));
     },
-    add_outflow(account, frequency, duration, price) {
-      const sim = this.get();
+    add_outflow(account, frequency, duration, price, sim = this.get()) {
       sim.outflows.push(a(account, frequency, duration, price));
+    },
+    init() {
+      // check localstorage
+      if (true) {
+        this.add_inflow(, this.get(''));
+      }
     },
   });
 });
@@ -63,7 +67,7 @@ function newSimMoney(title = "Money-oriented budget") {
   return {
     title,
     inflows: [a("Work", "every weekday", "8:00", 130)],
-    outflows: [a("Rent", "every Month", "0", 500)], // how often do you enjoy your apartment without doing a salient activity
+    outflows: [a("Rent", "every Month", "30", 500)], // how much time in a month do you enjoy your apartment without doing a salient activity
   };
 }
 
@@ -78,9 +82,9 @@ function newSimTime(title = "Time-oriented budget") {
     ],
     outflows: [
       a("Sleep", "Every day", "8:00", 5),
-      a("Resarch snails", "Every 2 months until Jan 01 2077", "8:00", 50),
-      a("Resarch epidemiology", "Every 2 days until Jan 01 2077", "10:00", 5),
-      a("Resarch epidemiology", "Every 2 days until Jan 01 2077", "10:00", 51),
+      a("Research snails", "Every 2 months until Jan 01 2077", "8:00", 50),
+      a("Research epidemiology", "Every 2 days until Jan 01 2077", "10:00", 5),
+      a("Research epidemiology", "Every 2 days until Jan 01 2077", "10:00", 51),
     ],
   };
 }
